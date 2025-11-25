@@ -1,0 +1,29 @@
+<div
+  class="d-flex flex-column flex-shrink-0 p-3 bg-dark text-white h-100"
+  id="app-sidebar"
+  style="width: 250px"
+>
+  <!-- User Info -->
+  <div class="mb-4">
+    <h5 class="mb-1"><%= user?.name || 'User' %></h5>
+    <span class="text-muted" style="font-size: 14px"
+      ><%= user?.role || 'role' %></span
+    >
+  </div>
+
+  <!-- Sidebar Menu -->
+  <ul class="nav nav-pills flex-column mb-auto">
+    <li class="nav-item">
+      <a href="/dashboard" class="nav-link text-white">Dashboard</a>
+    </li>
+
+    <li class="nav-item">
+      <a href="/dashboard/profile" class="nav-link text-white">Profile</a>
+    </li>
+  </ul>
+
+  <!-- Logout -->
+  <div class="mt-auto">
+    <a href="/logout" class="btn btn-danger w-100">Logout</a>
+  </div>
+</div>

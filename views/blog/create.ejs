@@ -13,11 +13,6 @@
     <div class="container mt-5" style="max-width: 600px">
       <h2 class="mb-4">Create Blog</h2>
 
-      <!-- Error Handling -->
-      <% if (error) { %>
-      <div class="alert alert-danger"><%= error %></div>
-      <% } %>
-
       <form action="/blog/create" method="POST">
         <!-- Title -->
         <div class="mb-3">

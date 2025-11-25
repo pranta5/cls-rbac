@@ -2,9 +2,11 @@ const express = require("express");
 const router = express.Router();
 
 const BlogPageController = require("../controllers/blog_page.controller");
-const BlogController = require("../controllers/blog.controller");
 
 const checkPermission = require("../helpers/middlewares/checkPermission");
+const blog_pageController = require("../controllers/blog_page.controller");
+//pages
+router.get("/", blog_pageController.home);
 
 router.get(
   "/blog/create",
@@ -12,6 +14,11 @@ router.get(
   BlogPageController.createPage
 );
 
+router.post(
+  "/blog/create",
+  checkPermission("create_record"),
+  BlogPageController.create
+);
 router.get(
   "/blog/edit/:id",
   checkPermission("update_record"),
@@ -19,19 +26,13 @@ router.get(
 );
 
 router.post(
-  "/blog/create",
-  checkPermission("create_record"),
-  BlogPageController.createPage
-);
-
-router.post(
   "/update/:id",
   checkPermission("update_record"),
-  BlogPageController.editPage
+  BlogPageController.edit
 );
 router.post(
-  "blog/delete/:id",
-  checkPermission("delete_record"),
+  "/blog/delete/:id",
+  checkPermission(),
   BlogPageController.deletePage
 );
 

@@ -125,6 +125,7 @@ class UserController {
       // build token payload
       const payload = {
         id: user._id,
+        name: user.name,
         role: user.role ? user.role.name : null,
       };
 

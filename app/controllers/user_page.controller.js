@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 class UserPageController {
   async registerPage(req, res) {
     res.render("user/register", {
+      user: req.user,
       title: "Register",
       error: null,
       success: null,
@@ -14,10 +15,7 @@ class UserPageController {
   }
 
   async loginPage(req, res) {
-    res.render("user/login", {
-      title: "Login",
-      error: null,
-    });
+    res.render("user/login", { user: req.user, title: "Login", error: null });
   }
 
   async register(req, res) {
@@ -90,7 +88,7 @@ class UserPageController {
       }
 
       const token = jwt.sign(
-        { id: user._id, role: user.role.name },
+        { id: user._id, name: user.name, role: user.role.name },
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
       );
@@ -117,18 +115,29 @@ class UserPageController {
         .lean();
 
       res.render("user/dashboard", {
+        user: req.user,
         title: "Dashboard",
         blogs,
-        success: req.query.success || null,
-        error: null,
+        success: req.query.success ? String(req.query.success) : null,
+        error: req.query.error ? String(req.query.error) : null,
       });
     } catch (error) {
       console.log(error);
       res.render("user/dashboard", {
+        user: req.user,
         title: "Dashboard",
         blogs: [],
         error: "Error loading blogs",
       });
+    }
+  }
+  async logout(req, res) {
+    try {
+      res.clearCookie("token");
+      return res.redirect("/login");
+    } catch (error) {
+      console.error("logout error:", error);
+      return res.redirect("/login");
     }
   }
 }

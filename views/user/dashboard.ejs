@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="utf-8" />
     <title>Dashboard - Blog List</title>
 
     <!-- Bootstrap CSS -->
@@ -8,73 +9,181 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+
+    <style>
+      body {
+        background: #f7f7f9;
+        min-height: 100vh;
+      }
+
+      /* 1) On md+ screens the sidebar is fixed on left, so push main content */
+      @media (min-width: 768px) {
+        #app-sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100vh;
+        }
+        .main-wrapper {
+          margin-left: 250px; /* same width as sidebar */
+        }
+      }
+
+      /* 2) On small screens remove the fixed behavior so offcanvas can include sidebar */
+      @media (max-width: 767.98px) {
+        #app-sidebar {
+          position: relative;
+          width: 100%;
+        }
+      }
+
+      /* small visual tweaks */
+      .main-content {
+        padding: 24px;
+      }
+      .table td,
+      .table th {
+        vertical-align: middle;
+      }
+    </style>
   </head>
 
   <body>
-    <div class="container mt-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>All Blogs</h2>
+    <!-- Topbar for small screens: shows button to open sidebar offcanvas -->
+    <nav class="navbar navbar-light bg-white d-md-none border-bottom">
+      <div class="container-fluid">
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasSidebar"
+          aria-controls="offcanvasSidebar"
+        >
+          ☰ Menu
+        </button>
 
-        <a href="/blog/create" class="btn btn-primary"> ➕ Create Blog </a>
+        <a class="navbar-brand mx-auto" href="/">MyLogo</a>
       </div>
+    </nav>
 
-      <!-- Success Message -->
-      <% if (success) { %>
-      <div class="alert alert-success"><%= success %></div>
-      <% } %>
+    <!-- Offcanvas sidebar for small screens -->
+    <div
+      class="offcanvas offcanvas-start"
+      tabindex="-1"
+      id="offcanvasSidebar"
+      aria-labelledby="offcanvasSidebarLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasSidebarLabel">Menu</h5>
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body p-0"><%- include('../layout/sidebar') %></div>
+    </div>
 
-      <!-- Error Message -->
-      <% if (error) { %>
-      <div class="alert alert-danger"><%= error %></div>
-      <% } %>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar column for md+ (we still include partial here but CSS will fix position) -->
+        <aside class="col-auto d-none d-md-block p-0">
+          <div style="width: 250px"><%- include('../layout/sidebar') %></div>
+        </aside>
 
-      <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-          <tr>
-            <th>#</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Writer</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+        <!-- Main content; margin-left applied in CSS on md+ -->
+        <main class="col main-wrapper">
+          <div class="main-content container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="m-0">All Blogs</h2>
+              <a href="/blog/create" class="btn btn-primary">➕ Create Blog</a>
+            </div>
 
-        <tbody>
-          <% if (blogs.length === 0) { %>
-          <tr>
-            <td colspan="5" class="text-center text-muted">No blogs found.</td>
-          </tr>
-          <% } %> <% blogs.forEach((blog, index) => { %>
-          <tr>
-            <td><%= index + 1 %></td>
-            <td><%= blog.title %></td>
-            <td><%= blog.des %></td>
-            <td><%= blog.writer ? blog.writer.name : "Unknown" %></td>
+            <% if (success) { %>
+            <div
+              class="alert alert-success alert-dismissible fade show"
+              role="alert"
+            >
+              <%= success %>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+              ></button>
+            </div>
+            <% } %> <% if (error) { %>
+            <div
+              class="alert alert-danger alert-dismissible fade show"
+              role="alert"
+            >
+              <%= error %>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+              ></button>
+            </div>
+            <% } %>
 
-            <td>
-              <a
-                href="/blog/edit/<%= blog._id %>"
-                class="btn btn-sm btn-warning"
-                >Edit</a
-              >
+            <div class="table-responsive shadow-sm rounded bg-white">
+              <table class="table table-bordered table-striped mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th style="width: 60px">#</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th style="width: 180px">Writer</th>
+                    <th style="width: 180px">Actions</th>
+                  </tr>
+                </thead>
 
-              <form
-                action="/blog/delete/<%= blog._id %>"
-                method="POST"
-                style="display: inline-block"
-              >
-                <button
-                  class="btn btn-sm btn-danger"
-                  onclick="return confirm('Delete this blog?')"
-                >
-                  Delete
-                </button>
-              </form>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
+                <tbody>
+                  <% if (!blogs || blogs.length === 0) { %>
+                  <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                      No blogs found.
+                    </td>
+                  </tr>
+                  <% } else { %> <% blogs.forEach((blog, index) => { %>
+                  <tr>
+                    <td class="align-middle"><%= index + 1 %></td>
+                    <td class="align-middle"><%= blog.title %></td>
+                    <td
+                      class="align-middle text-truncate"
+                      style="max-width: 380px"
+                    >
+                      <%= blog.des %>
+                    </td>
+                    <td class="align-middle">
+                      <%= blog.writer ? blog.writer.name : "Unknown" %>
+                    </td>
+                    <td class="align-middle">
+                      <div class="d-flex gap-2">
+                        <a
+                          href="/blog/edit/<%= blog._id %>"
+                          class="btn btn-sm btn-warning"
+                          >Edit</a
+                        >
+
+                        <form
+                          action="/blog/delete/<%= blog._id %>"
+                          method="POST"
+                          onsubmit="return confirm('Delete this blog?');"
+                          style="display: inline"
+                        >
+                          <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  <% }) %> <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
 
     <!-- Bootstrap JS -->

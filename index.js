@@ -9,6 +9,7 @@ const userPageRouter = require("./app/routers/userPage.router");
 const blogPageRouter = require("./app/routers/blogPage.router");
 
 const cookieParser = require("cookie-parser");
+const globalCheckuser = require("./app/helpers/utils/global.checkuser");
 require("dotenv").config();
 const app = express();
 
@@ -18,6 +19,16 @@ dbConnect();
 seedRoles();
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+// --- JWT decode middleware (global) ---
+app.use(globalCheckuser);
+
+app.use((req, res, next) => {
+  console.log("middleware set user =>", req.user);
+  res.locals.user = req.user || null;
+  next();
+});
+
 //view
 app.set("view engine", "ejs");
 app.set("views", "views");
